@@ -5,7 +5,7 @@ app_config = {
 
 db_config = {
     'HOST' : '192.168.0.1',
-    'PORT' : '27017',
+    'PORT' : 27017,
     'USER' : 'admin',
     'PASSWD' : 'kevin8197',
 }

@@ -4,7 +4,8 @@ app_config = {
 }
 
 db_config = {
-    'HOST' : '192.168.0.1',
+    'DB': 'bot_project',
+    'HOST' : '127.0.0.1',
     'PORT' : 27017,
     'USER' : 'admin',
     'PASSWD' : 'kevin8197',

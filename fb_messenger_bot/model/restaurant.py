@@ -17,11 +17,11 @@ class RestaurantQuerySet(QuerySet):
         return self.filter(avgCost__in=range(min, max+1))
     def get_by_name(self, name):
         return self.filter(name=name)
-    def get_by_address(self, address):
-        pass
     def get_by_id(self, rid):
         return self.filter(rid=rid)
-
+    def search_by_address(self, address, meter = 500):
+        return self.filter(address__near=list(address), address__max_distance=meter)
+    
 class Restaurant(Document):
     meta = {
         'collection': 'restaurant',
@@ -33,7 +33,10 @@ class Restaurant(Document):
     tasteRate = FloatField(min_value=0)
     classify = ListField(required=True)
     avgCost = IntField(min_value=0)
-    address = StringField(required=True)
+    address = PointField(required=True)
     hours = ListField()
     name = StringField(required=True)
     rid = LongField(required=True)
+
+# for i in Restaurant.objects.search_by_address((121.56008359778, 25.080193176667)):
+#     print(i.name)

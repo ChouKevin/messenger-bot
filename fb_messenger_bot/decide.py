@@ -1,88 +1,8 @@
-import os
-import sys
-import json
-from settings import *
-import logging
-import requests
-from flask import Flask, request
-
-from send_message import send_message 
-
-
-
+from imports_send import *
 
 def log(message):
     print(str(message))
     sys.stdout.flush()
-
-def send_button(recipient_id, message_text):
-    params = {
-        "access_token":app_config["PAGE_TOKEN"]
-    }
-    headers = {
-        "Content-Type": "application/json"
-    }
-    data = json.dumps({
-        
-        "recipient": {
-            "id": recipient_id
-        },
-        "message":{
-            "attachment":{
-              "type":"template",
-              "payload":{
-                "template_type":"button",
-                "text":message_text,
-                "buttons":[
-                  {
-                    "type":"web_url",
-                    "url":"https://www.facebook.com/ipeen/",
-                    "title":"Visit Messenger"
-                  }
-                ]
-              }
-            }
-        }
-    })
-    r=requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
-
-def send_location(recipient_id, message_text):
-    params = {
-         "access_token":app_config["PAGE_TOKEN"]
-    }
-    headers = {
-        "Content-Type": "application/json"
-        
-    }
-    data = json.dumps({
-        
-        "recipient": {
-            "id": recipient_id
-        },
-        "message":{
-            "text": "Here's a quick reply!",
-            "quick_replies":[
-              {
-                "content_type":"text",
-                "title":message_text,
-                "payload":"<POSTBACK_PAYLOAD>",
-                "image_url":"http://example.com/img/red.png"
-              },
-              {
-                "content_type":"location",
-                "image_url":"http://example.com/img/red.png"
-              },
-              {
-                "content_type":"text",
-                "title":"Something Else",
-                "payload":"<POSTBACK_PAYLOAD>"
-              }
-            ]
-        }
-    })
-    r=requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
-
-
 
 class decide(object):
     """docstring for Decide"""
@@ -93,33 +13,43 @@ class decide(object):
         if data["object"] == "page":
             for entry in data["entry"]:
                 for messaging_event in entry["messaging"]:
+                    quick_text="anymore action?"
                     if messaging_event.get("message"):  # someone sent us a message
                         sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
                         recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
                         if "text" not in messaging_event["message"]:
-                            diction = dict()
+                            typeText=""
                             for attachments in messaging_event["message"]["attachments"]:
-                                diction[sender_id]=attachments["payload"]["coordinates"]
+                                    typeText=attachments["type"]
+                            print(typeText)
+                            if typeText== "location":
+                                diction = dict()
+                                for attachments in messaging_event["message"]["attachments"]:
+                                    diction[sender_id]=attachments["payload"]["coordinates"]
                                 print(diction[sender_id],sender_id)
-                            send_message(sender_id, "location finished")
+                                location_tuple=(diction[sender_id]['long'],diction[sender_id]['lat'])
+                                send_message(sender_id,str(location_tuple))
+                                send_message(sender_id, "location finished")
+                            #elif typeText=="image":
+
                         else:
                             message_text = messaging_event["message"]["text"]  # the message's text
-                            #send_message(sender_id, decide.deal(message_text) + 'deeal')
-                            if message_text == "hi":
-                                send_message(sender_id, "hello")
-                            elif message_text == "!":
-                                send_location(sender_id, "where")
+                            
+                            if message_text == "I want eat...":
+                                send_message(sender_id, "what do you wanna eat?")
                             elif message_text == "news":
-                                send_button(sender_id, "this is news")
+                                send_button(sender_id, "this is news location we recommend")
+                            elif message_text =='image':
+                                send_image(sender_id)
+                            elif message_text == 'list':
+                                send_generic(sender_id)
                             else :
-                                send_message(sender_id, "we don not understand this text @by admin:"+message_text)
+                                quick_text="we don not understand this text @by admin:"+message_text+"Here's a quick reply!"
+                        send_quicky(sender_id,quick_text)
+                                
                     if messaging_event.get("delivery"):# delivery confirmation
                         pass
                     if messaging_event.get("optin"):  # optin confirmation
                         pass
                     if messaging_event.get("postback"):  # user clicked/tapped "postback" button in earlier message
                         pass
-
-    def deal(self, text):
-        return text
-    

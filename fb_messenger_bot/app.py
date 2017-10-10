@@ -1,12 +1,4 @@
-import os
-import sys
-import json
-from settings import *
 from decide import decide
-import logging
-import numpy as np
-
-import requests
 from flask import Flask, request
 
 app = Flask(__name__)
@@ -27,9 +19,9 @@ def verify():
 @app.route('/', methods=['POST'])
 def webhook():
     # endpoint for processing incoming messaging events
+    
     decide.process(request)
     return "ok", 200
-
 
 if __name__ == '__main__':
     app.run(debug=True)

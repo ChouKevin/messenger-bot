@@ -13,7 +13,7 @@ def send_quicky(recipient_id,text):
               },
               {
                 "content_type":"text",
-                "title":"I want eat...",
+                "title":"My buget...",
                 "payload":"<POSTBACK_PAYLOAD>"
               },
               {
@@ -21,6 +21,11 @@ def send_quicky(recipient_id,text):
                 "title":"news",
                 "payload":"<POSTBACK_PAYLOAD>"
               },
+              {
+                "content_type":"text",
+                "title":"I want eat...",
+                "payload":"<POSTBACK_PAYLOAD>"
+              }, 
               {
                 "content_type":"text",
                 "title":"image",

@@ -1,8 +1,8 @@
 from model.restaurant import *
 
 
-class DealMessege(object):
-    """docstring for DealMessege"""
+class DealMessage(object):
+    """docstring for DealMessage"""
     def __init__(self, sender):
         self.catalog = None
         self.sender = sender
@@ -19,7 +19,7 @@ class DealMessege(object):
         self.max_cost = max_cost
 
     def set_location(self, location):
-        self.location = set_location
+        self.location = location
 
     def set_distance(self, distance):
         self.distance = distance
@@ -28,13 +28,13 @@ class DealMessege(object):
         result = None
         if self.location is not None:
             if self.catalog is not None:
-                if max_cost is None:
+                if self.max_cost is None:
                     result = Restaurant.objects.search_by_catalog(self.location, self.catalog, self.distance)
                 else:
                     result = Restaurant.objects.search_by_avgCost(self.location, self.catalog, min_cost,
                                                                   max_cost, self.distance)
             else :
-                if max_cost is None:
+                if self.max_cost is None:
                     result = Restaurant.objects.search_by_address(self.location, self.distance)
                 else:
                     result = Restaurant.objects.search_by_avgCost(self.location, min_cost,

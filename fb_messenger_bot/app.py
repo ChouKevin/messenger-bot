@@ -1,9 +1,23 @@
 from decide import decide
 from flask import Flask, request
+from settings import *
+from mongoengine import *
 
 app = Flask(__name__)
 decide = decide()
 #r=requests.post('')
+
+
+
+register_connection(
+    alias='default',
+    name = db_config['DB'],
+    host = db_config['HOST'],
+    port = db_config['PORT'],
+    username = db_config['USER'],
+    password = db_config['PASSWD'],
+    authentication_source = 'admin'
+    )
 
 @app.route('/', methods=['GET'])
 def verify():

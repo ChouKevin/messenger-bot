@@ -25,7 +25,7 @@ class RestaurantQuerySet(QuerySet):
     def search_by_id(self, rid):
         return self.filter(rid=rid)
     def search_by_address(self, address, meter = 500):
-        return self.filter(address__near=list(location), address__max_distance=meter)
+        return self.filter(address__near=list(address), address__max_distance=meter)
     def search_by_catalog(self, address, catalog, meter = 500):
         return self.filter(Q(classify=catalog)
                             & Q(address__near=list(address), address__max_distance=meter))

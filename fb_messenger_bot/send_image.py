@@ -9,7 +9,7 @@ def send_image(recipient_id):
             "attachment":{
               "type":"image", 
               "payload":{
-                "url":"http://images5.fanpop.com/image/photos/31300000/beautiful-heart-pic-beautiful-pictures-31395948-600-900.jpg", 
+                "url":"http://iphoto.ipeen.com.tw/photo/ipeen/200x200/vip/3/7/0/store_10073/sp10073_20140818180447471.jpg", 
               }
             }
         },

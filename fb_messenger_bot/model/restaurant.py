@@ -13,15 +13,20 @@ register_connection(
     )
 
 class RestaurantQuerySet(QuerySet):
-    def get_by_avgCost(self, min, max):
-        return self.filter(avgCost__in=range(min, max+1))
-    def get_by_name(self, name):
+    def search_by_avgCost(self, location, min_cost=0, max_cost=100, meter = 500):
+        return self.filter(Q(avgCost__in=range(min_cost, max_cost+1)) 
+                           & Q(location__near=list(location), address__max_distance=meter))
+    def search_by_name(self, name):
         return self.filter(name=name)
-    def get_by_id(self, rid):
+    def search_by_id(self, rid):
         return self.filter(rid=rid)
-    def search_by_address(self, address, meter = 500):
-        return self.filter(address__near=list(address), address__max_distance=meter)
-    
+    def search_by_address(self, location, order_by='', meter = 500):
+        return self.filter(address__near=list(location), address__max_distance=meter)
+    def search_by_catelog(self, location, catelog, meter):
+        return self.filter(Q(catelog_in=catelog)
+                            & Q(location__near=list(location), address__max_distance=meter))
+    def list_cate(self):
+        return self.distinct('classify')
 class Restaurant(Document):
     meta = {
         'collection': 'restaurant',

@@ -9,33 +9,33 @@ def send_quicky(recipient_id,text):
             "text": text,
             "quick_replies":[
               {
+                "content_type":"text",
+                "title":"Result!!",
+                "payload":"<POSTBACK_PAYLOAD>"
+              },
+              {
                 "content_type":"location"
               },
               {
                 "content_type":"text",
-                "title":"My buget...",
+                "title":"distance",
                 "payload":"<POSTBACK_PAYLOAD>"
               },
               {
                 "content_type":"text",
-                "title":"news",
+                "title":"My budget...",
                 "payload":"<POSTBACK_PAYLOAD>"
               },
               {
                 "content_type":"text",
                 "title":"I want eat...",
                 "payload":"<POSTBACK_PAYLOAD>"
-              }, 
-              {
-                "content_type":"text",
-                "title":"image",
-                "payload":"<POSTBACK_PAYLOAD>"
               },
               {
                 "content_type":"text",
-                "title":"list",
+                "title":"Rank",
                 "payload":"<POSTBACK_PAYLOAD>"
-              }
+              },
             ]
         }
     })

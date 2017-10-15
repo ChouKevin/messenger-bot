@@ -2,8 +2,9 @@ from imports_send import *
 from model.restaurant import *
 from controller.dealMessage import *
 import pymongo
+from settings import *
 
-client= pymongo.MongoClient(host=settings.host,port=settings.port)
+ # client= pymongo.MongoClient(host=settings.host,port=settings.port)
 # db=client.
 restaurant=Restaurant()
 
@@ -39,64 +40,81 @@ class decide(object):
                                     diction[sender_id]=attachments["payload"]["coordinates"]
                                 print(diction[sender_id],sender_id)
                                 location_tuple=(diction[sender_id]['long'],diction[sender_id]['lat'])
-                                print(location_tuple[0])
-                                dealMessage.set_distance(1500)
-                                dealMessage.set_location((location_tuple[0],location_tuple[1]))
-                                send_message(sender_id,str(location_tuple)+"aaaaa")
-                                text=[]
-                                cost=[]
-                                for i in dealMessage.get_restaurant():
-                                    text.append(i.name)
-                                    cost.append(i.avgCost)
-                                send_generic(sender_id,text,cost)
-                                print(cost)
-                                    # print(str(i.name))
-                                    # print("==================")
-                                print("text append"+str(text))
-                                    # send_message(sender_id,str(i.name))
-                                
+                                source=dealMessage.search_sender(sender_id)
+                                dealMessage.set_cost(source.cost[0],source.cost[1])
+                                dealMessage.set_distance(source.distance)
+                                dealMessage.set_location(location_tuple)
+                                dealMessage.save_search_set()
+                                send_message(sender_id,str(location_tuple))
                                 send_message(sender_id, "location finished")
-
-                            #elif typeText=="image":
 
                         else:
                             message_text = messaging_event["message"]["text"]  # the message's text
-                            
                             if message_text == "I want eat...": 
                                 send_message(sender_id, "what do you wanna eat?")
-                            elif message_text == "My buget...":
-                                isquicky=False
-                                send_quicky_buget(sender_id)
+                            
                             elif message_text == "restaurant catalog":
                                 send_message(sender_id, "this is your catalog")
-                            elif '~' in message_text :
-                                under,upper= message_text.split("~")
-                                # dealMessage.set_location((121.56008359778, 25.080193176667))
-                                print("is get location ?"+str(location_tuple[0]))
-                                dealMessage.set_location((location_tuple[0],location_tuple[1]))
-                                dealMessage.set_cost(under,upper)
-                                for i in dealMessage.get_restaurant():
-                                    print(i.name)
+                            elif message_text =="Result!!":
+                                source=dealMessage.search_sender(sender_id)
+                                dealMessage.set_cost(source.cost[0],source.cost[1])
+                                dealMessage.set_distance(source.distance)
+                                # dealMessage.set_location(source.location)
+                                dealMessage.save_search_set()
                                 text=[]
                                 cost=[]
+                                rid=[]
+                                address=[]
+                                address.append(source.location['coordinates'])
+
+                                print([location_tuple[0],location_tuple[1]])
                                 for i in dealMessage.get_restaurant():
                                     text.append(i.name)
                                     cost.append(i.avgCost)
-                                send_generic(sender_id,text,cost)
-                                send_message(sender_id,"got $$"+under)
-                            elif ':' in message_text:
+                                    rid.append(i.rid)
+                                    address.append(i.address['coordinates'])
+                                if len(text) == 0:
+                                    send_message(sender_id,"no result")
+                                else :
+                                    send_generic(sender_id,text,cost,rid,address)
+
+                            elif message_text=="Rank":#rank
+                                isquicky=False
+                                send_Rank(sender_id)
+                            elif message_text == "My budget...":
+                                isquicky=False
+                                send_quicky_buget(sender_id)
+                            elif message_text == "distance":
+                                isquicky=False
+                                send_quicky_distance(sender_id)
+                            elif '~' in message_text : #cost
+                                source=dealMessage.search_sender(sender_id)
+                                under,upper= message_text.split("~")
+                                print(under,upper)
+                                dealMessage.set_distance(source.distance)
+                                dealMessage.set_cost(under,upper)
+                                dealMessage.save_search_set()
+
+                            elif ':' in message_text:# distance
+                                send_message(sender_id,"distance"+str(sender_id))
+                                print("distance:"+str(sender_id))
+                                source=dealMessage.search_sender(sender_id)
+                                print(type(source))
                                 key,value= message_text.split(":")
+                                dealMessage.set_cost(source.cost[0],source.cost[1])
+                                dealMessage.set_distance(value)
+                                dealMessage.save_search_set()
                             # # just testing function 
                             # elif message_text == "news":
                             #     dealMessage.set_distance
                                 # send_button(sender_id, "this is news location we recommend")
-                            elif message_text =='image':
-                                send_image(sender_id)
+                            # elif message_text =='image':
+                            #     send_image(sender_id)
                             # elif message_text == 'list':
                             #     send_generic(sender_id)
                             else :
                                 quick_text="we do not know this text:\n"+message_text+"\nHere's a quick reply!"
-
+                        # dealMessage.save_search_set()
                         if isquicky:
                             send_quicky(sender_id,quick_text)
                                 

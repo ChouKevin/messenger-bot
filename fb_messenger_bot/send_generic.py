@@ -1,4 +1,6 @@
 from imports import *
+import csv
+
 
 def send_generic(recipient_id):
     data = json.dumps({     
@@ -13,7 +15,7 @@ def send_generic(recipient_id):
                     "elements": [
                         {
                             "title": "Smurfs: The Lost Village (2017)",
-                            "image_url": "https://www.thesun.co.uk/wp-content/uploads/2017/02/nintchdbpict000300353851.jpg?strip=all&w=960",
+                            "image_url": "http://iphoto.ipeen.com.tw/photo/ipeen/200x200/def/8/4/8/838848/838848_20150412173830_6101.jpg",
                             "subtitle": "KFC landed in Singapore in 1977, when the first restaurant opened its doors at Somerset Road.Today KFC serves more than 1 million customers each month through over 80 stores across Singapore. This makes KFC one of the largest fast food chains in the country.We are passionate about serving our customers freshly prepared, great tasting food with a key part of this being The Colonel's signature blend of 11 herbs and spices. Even today these remain a secret with the original recipe under lock and key in our headquarters in Kentucky, USA.",
                             "default_action": {
                                 "type": "web_url",

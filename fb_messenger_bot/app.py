@@ -1,5 +1,5 @@
 from decide import decide
-from flask import Flask, request
+from flask import Flask, request, redirect, url_for
 from settings import *
 from mongoengine import *
 
@@ -33,9 +33,21 @@ def verify():
 @app.route('/', methods=['POST'])
 def webhook():
     # endpoint for processing incoming messaging events
-    
     decide.process(request)
     return "ok", 200
+
+@app.route('/', methods=['GET'])
+def process():
+    print(request.args.get('data')) #123
+
+@app.route('/rate', methods=['GET'])
+def rate():
+    rid = request.args.get('rid', default=None, type=int)
+    uid = request.args.get('uid', default=None, type=str)
+    print(rid, uid)
+    return redirect(url_for('process', data=123)) #url = /?data=123
+    # return redirect(url_for('process', data=123, code=307)) #code307 >> POST
+    # http://funhacks.net/2016/10/05/flask_redirect/
 
 if __name__ == '__main__':
     app.run(debug=True)

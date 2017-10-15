@@ -37,13 +37,12 @@ def send_generic(recipient_id,text,cost,rid,address):
                     "url": "https://www.google.com.tw/maps/dir/"+str(address[0][1])+","+str(address[0][0])+"/"+str(address[i+1][1])+","+str(address[i+1][0]),
                     "webview_height_ratio": "tall"
                 },
-                # {
-
-                #     "title": "select",
-                #     "type": "web_url",
-                #     "url": "/send_message",
-                #     "webview_height_ratio": "tall"
-                # }
+                {
+                    "title": "Rate",
+                    "type": "web_url",
+                    "url": "/rate?rid="+rid[i]+ '&uid='+ recipient_id,
+                    "webview_height_ratio": "tall"
+                }
             ]
         }))
     data = json.dumps({     

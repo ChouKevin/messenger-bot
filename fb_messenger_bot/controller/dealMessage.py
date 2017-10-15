@@ -1,5 +1,6 @@
 from model.restaurant import *
 from model.userProfile import *
+from model.restaurantImage import *
 import datetime
 
 class DealMessage(object):
@@ -57,3 +58,6 @@ class DealMessage(object):
                                              self.catalog, self.location, self.distance)
     def search_sender(self, sender):
         return UserProfile.objects.search_by_uid(sender)
+
+    def get_rid_image(self, rid):
+        return RestaurantImage.objects.search_by_rid(rid).url

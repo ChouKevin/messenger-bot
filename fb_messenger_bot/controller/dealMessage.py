@@ -16,8 +16,8 @@ class DealMessage(object):
         self.catalog = "[" + cata + "]"
 
     def set_cost(self, min_cost=0, max_cost=100):
-        self.min_cost = min_cost
-        self.max_cost = max_cost
+        self.min_cost = int(min_cost)
+        self.max_cost = int(max_cost)
 
     def set_location(self, location):
         self.location = location
@@ -27,19 +27,20 @@ class DealMessage(object):
 
     def get_restaurant(self, limit=10):
         result = None
-        if self.location is not None:
-            if self.catalog is not None:
-                if self.max_cost is None:
-                    result = Restaurant.objects.search_by_catalog(self.location, self.catalog, self.distance)[:limit]
-                else:
-                    result = Restaurant.objects.search_by_avgCost_catalog(self.location, self.catalog, self.min_cost,
-                                                                  self.max_cost, self.distance)[:limit]
-            else :
-                if self.max_cost is None:
-                    result = Restaurant.objects.search_by_address(self.location, self.distance)[:limit]
-                else:
-                    result = Restaurant.objects.search_by_avgCost(self.location, self.min_cost,
-                                                                  self.max_cost, self.distance)[:limit]
+        if self.location is None:
+            self.location = self.search_sender(self.sender).location['coordinates']
+        if self.catalog is not None:
+            if self.max_cost is None:
+                result = Restaurant.objects.search_by_catalog(self.location, self.catalog, self.distance)[:limit]
+            else:
+                result = Restaurant.objects.search_by_avgCost_catalog(self.location, self.catalog, self.min_cost,
+                                                                self.max_cost, self.distance)[:limit]
+        else :
+            if self.max_cost is None:
+                result = Restaurant.objects.search_by_address(self.location, self.distance)[:limit]
+            else:
+                result = Restaurant.objects.search_by_avgCost(self.location, self.min_cost,
+                                                                self.max_cost, self.distance)[:limit]
         return result
 
     def get_all_catalog(self):
@@ -51,7 +52,7 @@ class DealMessage(object):
             if sender_data is None:
                 raise Exception('Not Find User')
             else :
-                self.location = sender_data.location
+                self.location = sender_data.location['coordinates']
         return UserProfile.objects(uid=self.sender).insert_or_update([self.min_cost, self.max_cost],
                                              self.catalog, self.location, self.distance)
     def search_sender(self, sender):

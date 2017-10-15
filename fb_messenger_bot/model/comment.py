@@ -7,6 +7,8 @@ class CommentQuerySet(QuerySet):
         return self.filter(uid=uid)
     def search_by_rid(self, rid):
         return self.filter(rid=rid)
+    def rate_restaurant(self, rate, context):
+        return self.update_one(True, rate=rate, context=context)
         
 
 class Comment(Document):

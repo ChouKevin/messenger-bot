@@ -1,8 +1,9 @@
 from model.restaurant import *
+from model.userProfile import *
+import datetime
 
-
-class DealMessege(object):
-    """docstring for DealMessege"""
+class DealMessage(object):
+    """docstring for DealMessage"""
     def __init__(self, sender):
         self.catalog = None
         self.sender = sender
@@ -19,27 +20,32 @@ class DealMessege(object):
         self.max_cost = max_cost
 
     def set_location(self, location):
-        self.location = set_location
+        self.location = location
 
     def set_distance(self, distance):
         self.distance = distance
 
-    def get_restaurant(self):
+    def get_restaurant(self, limit=10):
         result = None
         if self.location is not None:
             if self.catalog is not None:
-                if max_cost is None:
-                    result = Restaurant.objects.search_by_catalog(self.location, self.catalog, self.distance)
+                if self.max_cost is None:
+                    result = Restaurant.objects.search_by_catalog(self.location, self.catalog, self.distance)[:limit]
                 else:
-                    result = Restaurant.objects.search_by_avgCost(self.location, self.catalog, min_cost,
-                                                                  max_cost, self.distance)
+                    result = Restaurant.objects.search_by_avgCost_catalog(self.location, self.catalog, self.min_cost,
+                                                                  self.max_cost, self.distance)[:limit]
             else :
-                if max_cost is None:
-                    result = Restaurant.objects.search_by_address(self.location, self.distance)
+                if self.max_cost is None:
+                    result = Restaurant.objects.search_by_address(self.location, self.distance)[:limit]
                 else:
-                    result = Restaurant.objects.search_by_avgCost(self.location, min_cost,
-                                                                  max_cost, self.distance)
+                    result = Restaurant.objects.search_by_avgCost(self.location, self.min_cost,
+                                                                  self.max_cost, self.distance)[:limit]
         return result
 
     def get_all_catalog(self):
         return Restaurant.objects.get_catalog()
+
+    def save_search_set(self):
+        UserProfile.objects.insert_or_update(self.sender, [self.min_cost, self.max_cost],
+                                             self.catalog, self.location, self.distance)
+    

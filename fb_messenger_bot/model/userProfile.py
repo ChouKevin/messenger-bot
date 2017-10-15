@@ -4,10 +4,10 @@ import datetime
 
 class UserProfileQuerySet(QuerySet):
     def search_by_uid(self, uid):
-        return self.filter(uid=uid)
-    def insert_or_update(self, uid, cost=[], catalog=[], location=[], distance=500):
-        return self.update_one(True, uid=uid, cost=cost, catalog=catalog,
-                               location=location, distance=distance, date=datetime.datetime.now())
+        return self.filter(uid=uid).first()
+    def insert_or_update(self, cost=[], catalog=[], location=[], distance=500):
+        return self.update_one(True, cost=cost, catalog=catalog,
+                               location=list(location), distance=distance, date=datetime.datetime.now())
 
 class UserProfile(Document):
     meta = {
@@ -19,6 +19,6 @@ class UserProfile(Document):
     uid = StringField(required=True, unique=True)
     cost = ListField()
     catalog = ListField()
-    location = PointField()
+    location = PointField(required=True)
     distance = FloatField()
     date = DateTimeField(required=True)

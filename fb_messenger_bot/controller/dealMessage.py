@@ -46,6 +46,7 @@ class DealMessage(object):
         return Restaurant.objects.get_catalog()
 
     def save_search_set(self):
-        UserProfile.objects.insert_or_update(self.sender, [self.min_cost, self.max_cost],
+        return UserProfile.objects(uid=self.sender).insert_or_update(self.sender, [self.min_cost, self.max_cost],
                                              self.catalog, self.location, self.distance)
-    
+    def search_sender(self, sender):
+        return UserProfile.objects.search_by_uid(sender)

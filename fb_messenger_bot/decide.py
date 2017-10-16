@@ -41,7 +41,7 @@ class decide(object):
                                 print(diction[sender_id],sender_id)
                                 location_tuple=(diction[sender_id]['long'],diction[sender_id]['lat'])
                                 source=dealMessage.search_sender(sender_id)
-                                dealMessage.set_cost(source.cost[0],source.cost[1])
+                                # dealMessage.set_cost(source.cost[0],source.cost[1])
                                 dealMessage.set_distance(source.distance)
                                 dealMessage.set_location(location_tuple)
                                 dealMessage.save_search_set()
@@ -101,7 +101,7 @@ class decide(object):
                                 source=dealMessage.search_sender(sender_id)
                                 print(type(source))
                                 key,value= message_text.split(":")
-                                dealMessage.set_cost(source.cost[0],source.cost[1])
+                                # dealMessage.set_cost(source.cost[0],source.cost[1])
                                 dealMessage.set_distance(value)
                                 dealMessage.save_search_set()
                             # # just testing function 

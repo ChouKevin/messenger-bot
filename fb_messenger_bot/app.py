@@ -2,6 +2,7 @@ from decide import decide
 from flask import Flask, request, redirect, url_for
 from settings import *
 from mongoengine import *
+from imports_send import *
 
 app = Flask(__name__)
 decide = decide()
@@ -33,15 +34,28 @@ def verify():
 @app.route('/', methods=['POST'])
 def webhook():
     # endpoint for processing incoming messaging events
-    decide.process(request)
+    print('root')
+    # return redirect(decide.process(request))
+    result = decide.process(request)
+    if result is not None:
+        # code=307 > POST  code=302 > GET
+        return redirect(url_for(result['path'], sender_id=result['sender_id'], data=result['data']))
     return "ok", 200
 
-@app.route('/', methods=['GET'])
-def process():
-    print(request.args.get('data')) #123
-
+@app.route('/location', methods=['GET', 'POST'])
+def location():
+    if request.method == 'GET':
+        print('location GET')
+        send_message(request.args.get('sender_id'), request.args.get('data'))
+        return 'ok', 200
+    else :
+        print('location POST')
+        print(request.args.get('sender_id'), request.args.get('data'))
+        return 'ok', 200
+        # input lacation
 @app.route('/rate', methods=['GET'])
 def rate():
+    print('rate')
     rid = request.args.get('rid', default=None, type=int)
     uid = request.args.get('uid', default=None, type=str)
     print(rid, uid)

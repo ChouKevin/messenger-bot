@@ -3,21 +3,17 @@ from send_message import *
 import csv
 
 
-def send_generic(recipient_id,text,cost,rid,address):
+def send_generic(recipient_id,text,cost,rid,address,imgURL):
     a=[]
-
-    # for i in text:
-    #     print(str(i))
+    print("enter send_generic 8")
     x=-1
     data_len=11
-    print(address)
     if len(text)<11 :
         data_len=len(text)
     for i in range(0,data_len):
-         # print(address)
         a.append(json.dumps({
             "title": text[i],
-            "image_url": "https://cdn.pixabay.com/photo/2015/04/08/13/13/food-712665_960_720.jpg",
+            "image_url":imgURL[i],
             "subtitle": "avgcost:"+str(cost[i])+"\n:"+"\n"+"location:"+str(address[i+1][1])+","+str(address[i+1][0]),
             "default_action": {
                 "type": "web_url",
@@ -40,7 +36,9 @@ def send_generic(recipient_id,text,cost,rid,address):
                 {
                     "title": "Rate",
                     "type": "web_url",
-                    "url": "/rate?rid="+rid[i]+ '&uid='+ recipient_id,
+                    # "url": "/rate?rid="+str(rid[i])+ '&uid='+ str(recipient_id),
+                    # "url": "http://www.ipeen.com.tw/shop/"+str(rid[i]),
+                    "url":" http://m.me/rate",
                     "webview_height_ratio": "tall"
                 }
             ]

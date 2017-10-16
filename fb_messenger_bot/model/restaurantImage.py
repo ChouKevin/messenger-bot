@@ -3,7 +3,7 @@ from mongoengine.fields import *
 
 class ImageQuerySet(QuerySet):
     def search_by_rid(self, rid):
-        return self.filter(rid=str(rid)).first()
+        return self.filter(rid=rid).first()
 
 # 偷懶一下
 class RestaurantImage(Document):
@@ -12,5 +12,5 @@ class RestaurantImage(Document):
         'queryset_class': ImageQuerySet,
         'strict': False,
     }
-    rid = StringField(required=True)
+    rid = LongField(required=True)
     url = StringField()

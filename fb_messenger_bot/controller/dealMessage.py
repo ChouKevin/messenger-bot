@@ -9,7 +9,7 @@ class DealMessage(object):
         self.catalog = None
         self.sender = sender
         self.min_cost = 0
-        self.max_cost = None
+        self.max_cost = 50000
         self.location = None
         self.distance = 100
 
@@ -60,4 +60,7 @@ class DealMessage(object):
         return UserProfile.objects.search_by_uid(sender)
 
     def get_rid_image(self, rid):
-        return RestaurantImage.objects.search_by_rid(rid).url
+        img = RestaurantImage.objects.search_by_rid(rid)
+        if img is None :
+            return  "https://tctechcrunch2011.files.wordpress.com/2015/03/messenger-developer.png"
+        return img.url

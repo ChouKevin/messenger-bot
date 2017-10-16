@@ -1,11 +1,9 @@
 from imports_send import *
 from model.restaurant import *
 from controller.dealMessage import *
-import pymongo
+from flask import redirect, url_for
 from settings import *
 
- # client= pymongo.MongoClient(host=settings.host,port=settings.port)
-# db=client.
 restaurant=Restaurant()
 
 def log(message):
@@ -29,6 +27,13 @@ class decide(object):
                         sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
                         recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
                         dealMessage=DealMessage(sender_id)
+
+                        
+                        if dealMessage.search_sender(sender_id) is None:
+                            print('not find sender')
+                            return {'path':'location', 'sender_id':sender_id, 'data':u"請輸入座標"}
+                            # return redirect(url_for('location', sender_id=sender_id, data=u"請輸入座標"))
+
                         if "text" not in messaging_event["message"]:
                             typeText=""
                             for attachments in messaging_event["message"]["attachments"]:
@@ -59,24 +64,26 @@ class decide(object):
                                 source=dealMessage.search_sender(sender_id)
                                 dealMessage.set_cost(source.cost[0],source.cost[1])
                                 dealMessage.set_distance(source.distance)
-                                # dealMessage.set_location(source.location)
                                 dealMessage.save_search_set()
                                 text=[]
                                 cost=[]
                                 rid=[]
                                 address=[]
+                                imgUrl=[]
                                 address.append(source.location['coordinates'])
 
-                                print([location_tuple[0],location_tuple[1]])
+                                print("decide line 75:")
                                 for i in dealMessage.get_restaurant():
                                     text.append(i.name)
                                     cost.append(i.avgCost)
                                     rid.append(i.rid)
                                     address.append(i.address['coordinates'])
+                                    imgUrl.append(dealMessage.get_rid_image(i.rid))
+                                    print(imgUrl)
                                 if len(text) == 0:
                                     send_message(sender_id,"no result")
                                 else :
-                                    send_generic(sender_id,text,cost,rid,address)
+                                    send_generic(sender_id,text,cost,rid,address,imgUrl)
 
                             elif message_text=="Rank":#rank
                                 isquicky=False
@@ -96,12 +103,16 @@ class decide(object):
                                 dealMessage.save_search_set()
 
                             elif ':' in message_text:# distance
-                                send_message(sender_id,"distance"+str(sender_id))
+
+                                send_message(sender_id,"distance"+str())
                                 print("distance:"+str(sender_id))
                                 source=dealMessage.search_sender(sender_id)
                                 print(type(source))
                                 key,value= message_text.split(":")
-                                # dealMessage.set_cost(source.cost[0],source.cost[1])
+                                source=dealMessage.search_sender(sender_id)
+                                dealMessage.set_cost(source.cost[0],source.cost[1])
+                                dealMessage.set_distance(value)
+                                dealMessage.save_search_set()
                                 dealMessage.set_distance(value)
                                 dealMessage.save_search_set()
                             # # just testing function 

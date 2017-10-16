@@ -3,4 +3,6 @@ __pycache
 .vscode
 
 *.ipynb
-*.py
+
+fb_messenger_bot/testModel.ipynb
+fb_messenger_bot/testModel.ipynb

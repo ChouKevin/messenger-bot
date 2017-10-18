@@ -8,6 +8,10 @@ class UserProfileQuerySet(QuerySet):
     def insert_or_update(self, cost=[], catalog=[], location=[], distance=500):
         return self.update_one(True, cost=cost, catalog=catalog,
                                location=list(location), distance=distance, date=datetime.datetime.now())
+    def set_status(self, stauts):
+        return self.update_one(True, status=stauts)
+    def get_status(self, uid):
+        return self.filter(uid=uid).first()
 
 class UserProfile(Document):
     meta = {
@@ -21,4 +25,5 @@ class UserProfile(Document):
     catalog = ListField()
     location = PointField(required=True)
     distance = FloatField()
+    status = StringField()
     date = DateTimeField(required=True)

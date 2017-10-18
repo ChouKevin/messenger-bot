@@ -9,5 +9,5 @@ class UserRate(object):
             return Comment.objects(uid=self.sender).search_by_rid(rid)
         else:
             return Comment.objects(uid=self.sender)
-    def rate_restaurant(self, score):
-        Comment.objects(uid=self.sender).rate_restaurant(score)
+    def rate_restaurant(self, rid, score):
+        Comment.objects.rate_restaurant(self.sender, rid, score)

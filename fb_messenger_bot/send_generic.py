@@ -34,11 +34,9 @@ def send_generic(recipient_id,text,cost,rid,address,imgURL):
                     "webview_height_ratio": "tall"
                 },
                 {
-                    "title": "Rate",
-                    "type": "web_url",
-                    # "url": "/rate?rid="+str(rid[i])+ '&uid='+ str(recipient_id),
-                    # "url": "http://www.ipeen.com.tw/shop/"+str(rid[i]),
-                    "url":" http://m.me/rate",
+                    "type":"postback",
+                    "title":"Rate",
+                    "payload":json.dumps({"path":"rate","uid":recipient_id,"rid":str(rid[i]),"data":"please enter your rate"}),
                     "webview_height_ratio": "tall"
                 }
             ]

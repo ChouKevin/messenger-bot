@@ -3,8 +3,11 @@ from settings import *
 import requests
 
 class SendQuick(object):
-    def __init__(self, recipient_id):
-        self.recipient_id = recipient_id
+    def __init__(self):
+        self.recipient_id=None
+
+    def set_sender_id(self, uid):
+        self.recipient_id = uid
 
     def send_main_replies(self, text):
         content_type = ['text', 'location', 'text', 'text', 'text']
@@ -15,7 +18,7 @@ class SendQuick(object):
         distance = []
         content_type = []
         for i in range(0,9):
-            distance.append(str(i*500))
+            distance.append(':'+str(i*500))
             content_type.append('text')
         self.send(content_type, distance, text)
 

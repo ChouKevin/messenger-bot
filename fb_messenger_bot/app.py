@@ -10,6 +10,7 @@ import json
 app = Flask(__name__)
 decide = decide()
 #r=requests.post('')
+sq = SendQuick()
 
 register_connection(
     alias='default',
@@ -34,10 +35,11 @@ def verify():
 @app.route('/', methods=['POST'])
 def webhook():
     # endpoint for processing incoming messaging events
+    # code=307 > POST  code=302 > GET
     print('root')
-    result = decide.process(request)
+    result = decide.parse_request(request)
     if result is not None:
-        # code=307 > POST  code=302 > GET
+        sq.set_sender_id(result['sender_id'])
         return redirect(url_for(result['path'], sender_id=result['sender_id'], data=result['data']))
     return "ok", 200
 
@@ -45,23 +47,32 @@ def webhook():
 def location():
     if request.method == 'GET':
         print('location GET')
-        sq = SendQuick(request.args.get('sender_id'))
         sq.send_main_replies(request.args.get('data'))
         return 'ok', 200
     else :
         print('location POST')
-        print(request.args.get('sender_id'), request.args.get('data'))
+        
         return 'ok', 200
         # input lacation
-@app.route('/rate', methods=['GET'])
+@app.route('/rate', methods=['GET', 'POST'])
 def rate():
     print('rate')
     rid = request.args.get('rid', default=None, type=int)
     uid = request.args.get('uid', default=None, type=str)
-    print(rid, uid)
-    return redirect(url_for('process', data=123)) #url = /?data=123
-    # return redirect(url_for('process', data=123, code=307)) #code307 >> POST
-    # http://funhacks.net/2016/10/05/flask_redirect/
+    return 'ok', 200
+
+@app.route('/distance', methods=['GET', 'POST'])
+def distance():
+    if request.method == 'GET':
+        sq.send_distance(request.args.get('data'))
+    else :
+        sq.send_main_replies('i got it')
+    return 'ok', 200
+
+@app.route('/nothing', methods=['GET', 'POST'])
+def nothing():
+    sq.send_main_replies(request.args.get('data'))
+    return 'ok', 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

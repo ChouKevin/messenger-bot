@@ -64,3 +64,13 @@ class DealMessage(object):
         if img is None :
             return  "https://tctechcrunch2011.files.wordpress.com/2015/03/messenger-developer.png"
         return img.url
+
+    def set_user_status(self, stauts):
+        return UserProfile.objects(uid=self.sender).set_status(stauts)
+
+    def get_user_stauts(self):
+        user = UserProfile.objects.get_status(self.sender)
+        if user is None or user.status is None:
+            return 'nothing'
+        else:
+            return user.stauts

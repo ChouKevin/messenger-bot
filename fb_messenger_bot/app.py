@@ -3,12 +3,13 @@ from flask import Flask, request, redirect, url_for
 from settings import *
 from mongoengine import *
 from imports_send import *
+from sendQuick import SendQuick
+from send_quicky import *
+import json
 
 app = Flask(__name__)
 decide = decide()
 #r=requests.post('')
-
-
 
 register_connection(
     alias='default',
@@ -30,12 +31,10 @@ def verify():
         return request.args["hub.challenge"], 200
     return "Hello world", 200
 
-# (int, int)
 @app.route('/', methods=['POST'])
 def webhook():
     # endpoint for processing incoming messaging events
     print('root')
-    # return redirect(decide.process(request))
     result = decide.process(request)
     if result is not None:
         # code=307 > POST  code=302 > GET
@@ -46,7 +45,8 @@ def webhook():
 def location():
     if request.method == 'GET':
         print('location GET')
-        send_message(request.args.get('sender_id'), request.args.get('data'))
+        sq = SendQuick(request.args.get('sender_id'))
+        sq.send_main_replies(request.args.get('data'))
         return 'ok', 200
     else :
         print('location POST')
@@ -64,4 +64,4 @@ def rate():
     # http://funhacks.net/2016/10/05/flask_redirect/
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)

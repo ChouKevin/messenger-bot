@@ -1,6 +1,6 @@
 from imports import *
 
-def send_quicky(recipient_id,text):
+def send_quicky(recipient_id,text=''):
     data = json.dumps({     
         "recipient": {
             "id": recipient_id
@@ -10,11 +10,13 @@ def send_quicky(recipient_id,text):
             "quick_replies":[
               {
                 "content_type":"text",
-                "title":"Result!!",
+                "title":"search",
                 "payload":"<POSTBACK_PAYLOAD>"
               },
               {
-                "content_type":"location"
+                "content_type":"location",
+                "title":"my location",
+                "payload":"<POSTBACK_PAYLOAD>"
               },
               {
                 "content_type":"text",
@@ -30,13 +32,9 @@ def send_quicky(recipient_id,text):
                 "content_type":"text",
                 "title":"I want eat...",
                 "payload":"<POSTBACK_PAYLOAD>"
-              },
-              {
-                "content_type":"text",
-                "title":"Rank",
-                "payload":"<POSTBACK_PAYLOAD>"
-              },
+              }
             ]
         }
     })
+    print(data)
     r=requests.post("https://graph.facebook.com/v2.6/me/messages", params=app_config["PARAMS"], headers=app_config["HEADERS"], data=data)

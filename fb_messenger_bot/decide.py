@@ -13,11 +13,22 @@ def log(message):
 class decide(object):
     """docstring for Decide"""
     def __init__(self):
-        pass
+        self.sender_id = None
+        self.recipient_id = None
+        self.data = None
+
+    def parse_request(self, data):
+        self.data = request.get_json()
+        if data["object"] == "page":
+            for entry in data["entry"]:
+                for messaging_event in entry["messaging"]:
+                    if messaging_event.get("message"):  # someone sent us a message
+                        self.sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
+                        self.recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
+
+
     def process(self, request):
         data = request.get_json()
-        
-        location_tuple=(0,0)
         if data["object"] == "page":
             for entry in data["entry"]:
                 for messaging_event in entry["messaging"]:
@@ -31,8 +42,7 @@ class decide(object):
                         
                         if dealMessage.search_sender(sender_id) is None:
                             print('not find sender')
-                            return {'path':'location', 'sender_id':sender_id, 'data':u"請輸入座標"}
-                            # return redirect(url_for('location', sender_id=sender_id, data=u"請輸入座標"))
+                            return {'path':'location', 'sender_id':sender_id, 'data': 'please input your location to apply for user' }
 
                         if "text" not in messaging_event["message"]:
                             typeText=""
@@ -115,14 +125,6 @@ class decide(object):
                                 dealMessage.save_search_set()
                                 dealMessage.set_distance(value)
                                 dealMessage.save_search_set()
-                            # # just testing function 
-                            # elif message_text == "news":
-                            #     dealMessage.set_distance
-                                # send_button(sender_id, "this is news location we recommend")
-                            # elif message_text =='image':
-                            #     send_image(sender_id)
-                            # elif message_text == 'list':
-                            #     send_generic(sender_id)
                             else :
                                 quick_text="we do not know this text:\n"+message_text+"\nHere's a quick reply!"
                         # dealMessage.save_search_set()

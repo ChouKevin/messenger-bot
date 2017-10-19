@@ -17,50 +17,73 @@ def log(message):
 class decide(object):
     """docstring for Decide"""
 
-    def parse_request(self, data, session):
+    def parse_request(self, data):
         data = request.get_json()
         if data["object"] == "page":
             for entry in data["entry"]:
-                for messaging_event in entry["messaging"]:
+                for messaging_event in entry.get("messaging", []):
                     if messaging_event.get("message"):  # someone sent us a message
                         sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
                         recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
                         dealMessage = DealMessage(sender_id)
-                        if dealMessage.search_sender(sender_id) is None:
-                            return {'path':'location', 'sender_id':sender_id, 'data': 'please input your location to be our user' }
+                        sender_profile = dealMessage.search_sender(sender_id)
                         if "text" not in messaging_event["message"]:
-                            pass
+                            for attachments in messaging_event["message"]["attachments"]:
+                                    typeText=attachments["type"]
+                            if typeText == "location":
+                                for attachments in messaging_event["message"]["attachments"]:
+                                    tmp=attachments["payload"]["coordinates"]
+                                    location=(float(tmp['long']), float(tmp['lat']))
+                                    dealMessage.set_location(location)
+                                return {'path':typeText, 'sender_id': sender_id, 'data':data, 'code':307, 'value':location}
+                        if sender_profile is None:
+                            print('not find user')
+                            return {'path':'location', 'sender_id':sender_id, 'data': 'please input your location to be our user', 'code':302, 'value':0}
                         else:
                             message_text = messaging_event["message"]["text"]
-                            path = self.decide_action(message_text, dealMessage.get_user_stauts())
-                            dealMessage.set_user_status(path)
+                            path, code, value = self.decide_action(message_text)
+                            if code == 307:
+                                if path == 'budget':
+                                    dealMessage.set_cost(int(value[0]), int(value[1]))
+                            print(path, code, value)
                             data = self.decide_talk(path)
-                            return {'path':path, 'sender_id':sender_id, 'data': data}
+                            return {'path': path, 'sender_id': sender_id, 'data': data, 'code': code, 'value':value}
+                    if messaging_event.get("postback"):  # user clicked/tapped "postback" button in earlier message
+                        title = messaging_event["postback"]["title"]
+                        rest_id = messaging_event["postback"]["payload"]
+                        sender_id = messaging_event["sender"]["id"]
+                        print(title, rest_id, sender_id)
+                        # userRate=UserRate(sender_id)
+                        # userRate.rate_restaurant()
+                        # send_message(sender_id,"!@#")
     
-    def is_number_intervel(self, text):
-        pass
-
-    
-    def decide_action(self, message_text, status):
-        path = None
-        if status == 'nothing':
-            if message_text == "I want eat...": 
-                send_message(sender_id, "what do you wanna eat?")
-            elif message_text == "restaurant catalog":
-                send_message(sender_id, "this is your catalog")
-            elif message_text == "search":
-                path = 'search'
-            elif message_text == "My budget...":
-                path = 'budget'
-            elif message_text == "distance":
-                path = 'distance'
-            elif message_text == 'rate':
-                path = 'rate'
-            else:
-                path = 'nothing'
+    def parse_number(self, text):
+        if len(re.findall('^([0-9]+)\-([0-9]+)', text)) == 1:
+            return 'budget', 307, re.findall('^([0-9]+)\-([0-9]+)', text)[0]
+        elif len(re.findall('^:([0-9]+)', text)) == 1:
+            return 'distance', 307, re.findall('^:([0-9]+)', text)[0]
+        elif len(re.findall('\*([0-9]+)', text)) == 1:
+            return 'rate', 307, re.findall('\*([0-9]+)', text)[0]
         else:
-            path = status
-        return path
+            return 'nothing', 302, 0
+    
+    def decide_action(self, message_text):
+        path = None
+        code = 302
+        value = 0
+        if message_text == "I want eat...": 
+            path = 'catalog'
+        elif message_text == "search":
+            path = 'search'
+        elif message_text == "My budget...":
+            path = 'budget'
+        elif message_text == "distance":
+            path = 'distance'
+        elif message_text == 'rate':
+            path = 'rate'
+        else:
+            path, code, value = self.parse_number(message_text)
+        return path, code, value
 
     def decide_talk(self, action):
         talk = None
@@ -84,7 +107,7 @@ class decide(object):
         if data["object"] == "page":
             for entry in data["entry"]:
 
-                for messaging_event in entry.get("messaging",[]):
+                for messaging_event in entry.get("messaging", []):
                     quick_text="anymore action?"
                     isquicky=True
                     if messaging_event.get("message"):  # someone sent us a message
@@ -95,7 +118,7 @@ class decide(object):
                         sendQuick=SendQuick(sender_id)
                         if dealMessage.search_sender(sender_id) is None:
                             print('not find sender')
-                            return {'path':'location', 'sender_id':sender_id, 'data': 'please input your location to apply for user' }
+                            return {'path':'location', 'sender_id':sender_id, 'data': 'please input your location' }
 
                         if "text" not in messaging_event["message"]:
                             typeText=""
@@ -134,7 +157,6 @@ class decide(object):
                                 imgUrl=[]
                                 address.append(source.location['coordinates'])
 
-                                print("decide line 75:")
                                 for i in dealMessage.get_restaurant():
                                     text.append(i.name)
                                     cost.append(i.avgCost)
@@ -147,9 +169,6 @@ class decide(object):
                                 else :
                                     send_generic(sender_id,text,cost,rid,address,imgUrl)
 
-                            elif message_text=="Rank":#rank
-                                isquicky=False
-                                send_Rank(sender_id)
                             elif message_text == "My budget...":
                                 isquicky=False
                                 #send_quicky_buget(sender_id)
@@ -161,7 +180,6 @@ class decide(object):
                             elif '-' in message_text : #cost
                                 source=dealMessage.search_sender(sender_id)
                                 under,upper= message_text.split("-")
-                                print(under,upper)
                                 dealMessage.set_distance(source.distance)
                                 dealMessage.set_cost(under,upper)
                                 dealMessage.save_search_set()

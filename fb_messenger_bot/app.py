@@ -5,12 +5,14 @@ from mongoengine import *
 from imports_send import *
 from sendQuick import SendQuick
 from send_quicky import *
+from controller import *
 import json
 
 app = Flask(__name__)
 decide = decide()
 #r=requests.post('')
 sq = SendQuick()
+dl = dealMessage.DealMessage('')
 
 register_connection(
     alias='default',
@@ -40,20 +42,21 @@ def webhook():
     result = decide.parse_request(request)
     if result is not None:
         sq.set_sender_id(result['sender_id'])
-        return redirect(url_for(result['path'], sender_id=result['sender_id'], data=result['data']))
+        dl.sender = result['sender_id']
+        if result['code'] == 307 :
+            return redirect(url_for(result['path'], sender_id=result['sender_id'], data=result['data'], value=result['value']), code=result['code'])
+        else:
+            return redirect(url_for(result['path'], sender_id=result['sender_id'], data=result['data'], value=result['value']))
     return "ok", 200
 
 @app.route('/location', methods=['GET', 'POST'])
 def location():
     if request.method == 'GET':
-        print('location GET')
         sq.send_main_replies(request.args.get('data'))
-        return 'ok', 200
     else :
-        print('location POST')
-        
-        return 'ok', 200
-        # input lacation
+        sq.send_main_replies('i got it')
+    return 'ok', 200
+
 @app.route('/rate', methods=['GET', 'POST'])
 def rate():
     print('rate')
@@ -65,6 +68,25 @@ def rate():
 def distance():
     if request.method == 'GET':
         sq.send_distance(request.args.get('data'))
+    else :
+        dl.set_distance(request.args.get('value'))
+        sq.send_main_replies('i got it')
+    return 'ok', 200
+
+@app.route('/budget', methods=['GET', 'POST'])
+def budget():
+    print('budget')
+    if request.method == 'GET':
+        sq.send_interval_cost()
+    else :
+        sq.send_main_replies('i got it')
+    return 'ok', 200
+
+@app.route('/catalog', methods=['GET', 'POST'])
+def catalog():
+    print('budget')
+    if request.method == 'GET':
+        sq.send_main_replies('to be continue')
     else :
         sq.send_main_replies('i got it')
     return 'ok', 200

@@ -10,4 +10,4 @@ class UserRate(object):
         else:
             return Comment.objects(uid=self.sender)
     def rate_restaurant(self, rid, score):
-        Comment.objects.rate_restaurant(self.sender, rid, score)
+        Comment.objects(uid=self.sender).rate_restaurant(rid, score)

@@ -17,14 +17,20 @@ class DealMessage(object):
         self.catalog = "[" + cata + "]"
 
     def set_cost(self, min_cost=0, max_cost=100):
-        self.min_cost = int(min_cost)
-        self.max_cost = int(max_cost)
+        self.min_cost = min(int(min_cost), int(max_cost))
+        self.max_cost = max(int(min_cost), int(max_cost))
+        UserProfile.objects(uid=self.sender).update_cost(self.min_cost, self.max_cost)
 
     def set_location(self, location):
         self.location = location
+        UserProfile.objects(uid=self.sender).update_location(location)
 
     def set_distance(self, distance):
-        self.distance = distance
+        self.distance = int(distance)
+        UserProfile.objects(uid=self.sender).update_distance(distance)
+
+    def record_user_rid(self, rid):
+        UserProfield.objects(uid=self.sender).update_rid(int(rid))
 
     def get_restaurant(self, limit=10):
         result = None
